@@ -1,0 +1,2 @@
+Retrieval-Augmented Generation improves answer quality by retrieving relevant
+document chunks before generation.
