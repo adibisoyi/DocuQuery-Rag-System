@@ -1,6 +1,7 @@
 from app.chunking.chunker import Chunker
 from app.embeddings.embedder import Embedder
 from app.ingestion.loader import DocumentLoader
+from app.retrieval.retriever import Retriever
 from app.retrieval.vector_store import VectorStore
 
 
@@ -21,14 +22,14 @@ def main() -> None:
         print("No embeddings generated. Exiting.")
         return
 
-    embedding_dim = len(records[0].embedding)
-    vector_store = VectorStore(embedding_dim=embedding_dim)
+    vector_store = VectorStore(embedding_dim=len(records[0].embedding))
     vector_store.add_embeddings(records)
     print(f"Indexed {len(vector_store.records)} records in FAISS")
 
+    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3)
+
     query = "What is FAISS used for?"
-    query_embedding = embedder.embed_texts([query])[0].tolist()
-    results = vector_store.search(query_embedding, top_k=3)
+    results = retriever.retrieve(query)
 
     print(f"\nQuery: {query}")
     print(f"Retrieved {len(results)} results")
