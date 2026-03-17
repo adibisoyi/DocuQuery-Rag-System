@@ -2,25 +2,25 @@ from __future__ import annotations
 
 from typing import List
 
+from app.generation.providers.base import BaseGenerationProvider
+from app.generation.providers.fallback_provider import FallbackGenerationProvider
 from app.schemas.models import QueryResponse, RetrievalResult
 
 
 class Generator:
     """
-    Builds a grounded response from retrieved chunks.
-
-    This baseline implementation does not yet call an external LLM.
-    It formats retrieved evidence into a deterministic answer so the
-    pipeline remains testable before API integration.
+    Handles prompt construction and delegates generation to a provider.
     """
 
-    def __init__(self, max_context_chunks: int = 3) -> None:
+    def __init__(
+        self,
+        provider: BaseGenerationProvider | None = None,
+        max_context_chunks: int = 3,
+    ) -> None:
+        self.provider = provider or FallbackGenerationProvider()
         self.max_context_chunks = max_context_chunks
 
     def build_context(self, results: List[RetrievalResult]) -> str:
-        """
-        Build a text context block from top retrieval results.
-        """
         selected = results[: self.max_context_chunks]
 
         context_blocks = []
@@ -33,9 +33,6 @@ class Generator:
         return "\n\n".join(context_blocks)
 
     def build_prompt(self, question: str, results: List[RetrievalResult]) -> str:
-        """
-        Construct the grounded prompt that would be sent to an LLM.
-        """
         context = self.build_context(results)
 
         return (
@@ -48,12 +45,6 @@ class Generator:
         )
 
     def generate(self, question: str, results: List[RetrievalResult]) -> QueryResponse:
-        """
-        Baseline generation method.
-
-        For now, returns a deterministic grounded response using retrieved chunks.
-        This keeps the architecture correct and testable before integrating an LLM provider.
-        """
         if not results:
             return QueryResponse(
                 answer="I don't know based on the provided documents.",
@@ -61,13 +52,22 @@ class Generator:
                 metadata={"prompt": self.build_prompt(question, results)},
             )
 
-        top_result = results[0]
-        answer = top_result.chunk.text.strip()
+        prompt = self.build_prompt(question, results)
 
-        sources = [f"{result.chunk.source}::{result.chunk.chunk_id}" for result in results[: self.max_context_chunks]]
+        # Call provider
+        provider_output = self.provider.generate(prompt)
+
+        # Still use top chunk as fallback grounding
+        top_result = results[0]
+        grounded_answer = top_result.chunk.text.strip()
+
+        sources = [
+            f"{result.chunk.source}::{result.chunk.chunk_id}"
+            for result in results[: self.max_context_chunks]
+        ]
 
         return QueryResponse(
-            answer=answer,
+            answer=f"{provider_output}\n\n{grounded_answer}",
             sources=sources,
-            metadata={"prompt": self.build_prompt(question, results)},
+            metadata={"prompt": prompt},
         )
