@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from pathlib import Path
+from app.maintenance.cleanup_indexes import cleanup_indexes
 
 from app.core.config import DEFAULT_CORPUS_PATH, get_corpus_name_from_path
 from app.core.paths import get_faiss_index_path, get_manifest_path, get_records_path
@@ -39,6 +40,7 @@ APP_STATE: dict = {
 def index_documents() -> IndexResponse:
     corpus_path = Path(DEFAULT_CORPUS_PATH)
     corpus_name = get_corpus_name_from_path(corpus_path)
+    cleanup_summary = cleanup_indexes(active_corpus_name=corpus_name)
 
     faiss_index_path = get_faiss_index_path(corpus_name)
     records_path = get_records_path(corpus_name)
