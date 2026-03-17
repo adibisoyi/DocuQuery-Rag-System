@@ -10,6 +10,7 @@ from app.generation.providers.provider_factory import get_generation_provider
 from app.ingestion.loader import DocumentLoader
 from app.retrieval.retriever import Retriever
 from app.retrieval.vector_store import VectorStore
+from app.core.config import DEFAULT_CORPUS_PATH
 
 router = APIRouter()
 
@@ -26,7 +27,7 @@ APP_STATE: dict = {
 
 @router.post("/documents/index", response_model=IndexResponse)
 def index_documents() -> IndexResponse:
-    loader = DocumentLoader(data_dir="data/raw")
+    loader = DocumentLoader(data_dir=DEFAULT_CORPUS_PATH)
     documents = loader.load_documents()
 
     if not documents:
