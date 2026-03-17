@@ -1,0 +1,25 @@
+[
+  {
+    "question": "What is FAISS used for?",
+    "expected_source": "notes.md::notes.md_chunk_1",
+    "expected_answer_contains": [
+      "efficient similarity search",
+      "dense vector embeddings"
+    ]
+  },
+  {
+    "question": "What improves answer quality by retrieving relevant document chunks before generation?",
+    "expected_source": "sample.txt::sample.txt_chunk_1",
+    "expected_answer_contains": [
+      "retrieval",
+      "answer quality"
+    ]
+  },
+  {
+    "question": "What is the capital of France?",
+    "expected_source": null,
+    "expected_answer_contains": [
+      "I don't know"
+    ]
+  }
+]
