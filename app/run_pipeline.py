@@ -28,7 +28,7 @@ def main() -> None:
     vector_store.add_embeddings(records)
     print(f"Indexed {len(vector_store.records)} records in FAISS")
 
-    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3)
+    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3, min_score_threshold=0.15)
     generator = Generator(provider=get_generation_provider(), max_context_chunks=3)
 
     query = "What is FAISS used for?"

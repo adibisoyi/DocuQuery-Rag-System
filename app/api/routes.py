@@ -47,7 +47,7 @@ def index_documents() -> IndexResponse:
     vector_store = VectorStore(embedding_dim=len(records[0].embedding))
     vector_store.add_embeddings(records)
 
-    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3)
+    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3, min_score_threshold=0.15)
     generator = Generator(provider=get_generation_provider(), max_context_chunks=3)
 
     APP_STATE["is_indexed"] = True

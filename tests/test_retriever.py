@@ -53,3 +53,29 @@ def test_retriever_returns_empty_for_blank_query() -> None:
     results = retriever.retrieve("   ")
 
     assert results == []
+
+def test_retriever_rejects_low_confidence_match() -> None:
+    chunks = [
+        Chunk(
+            chunk_id="chunk_1",
+            source="doc1.txt",
+            text="FAISS is used for efficient similarity search over dense vectors.",
+            metadata={},
+        )
+    ]
+
+    embedder = Embedder()
+    records = embedder.embed_chunks(chunks)
+
+    store = VectorStore(embedding_dim=len(records[0].embedding))
+    store.add_embeddings(records)
+
+    retriever = Retriever(
+        embedder=embedder,
+        vector_store=store,
+        top_k=2,
+        min_score_threshold=0.9,
+    )
+
+    results = retriever.retrieve("What is the capital of France?")
+    assert results == []

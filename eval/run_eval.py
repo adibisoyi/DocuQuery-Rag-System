@@ -29,7 +29,7 @@ def build_pipeline() -> tuple[Retriever, Generator]:
     vector_store = VectorStore(embedding_dim=len(records[0].embedding))
     vector_store.add_embeddings(records)
 
-    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3)
+    retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3, min_score_threshold=0.15)
     generator = Generator(provider=get_generation_provider(), max_context_chunks=3)
 
     return retriever, generator
@@ -51,6 +51,7 @@ def evaluate_case(case: Dict[str, Any], retriever: Retriever, generator: Generat
     actual_source = response.sources[0] if response.sources else None
     source_match = actual_source == expected_source
 
+    top_score = results[0].score if results else None
     answer_text = response.answer.lower()
     answer_match = all(expected.lower() in answer_text for expected in expected_answer_contains)
 
@@ -61,6 +62,7 @@ def evaluate_case(case: Dict[str, Any], retriever: Retriever, generator: Generat
         "source_match": source_match,
         "answer": response.answer,
         "answer_match": answer_match,
+        "top_score": top_score,
     }
 
 
@@ -88,6 +90,7 @@ def main() -> None:
         print(f"Source match:   {result['source_match']}")
         print(f"Answer match:   {result['answer_match']}")
         print(f"Answer:         {result['answer']}")
+        print(f"Top score:      {result['top_score']}")
 
 
 if __name__ == "__main__":
