@@ -11,3 +11,6 @@ DEFAULT_CORPUS_PATH = PROJECT_ROOT / "data" / "corpora" / DEFAULT_CORPUS_NAME
 
 DEFAULT_INDEX_ROOT = PROJECT_ROOT / "index"
 DEFAULT_EVAL_DATASET = PROJECT_ROOT / "eval" / "eval_dataset.json"
+
+def get_corpus_name_from_path(corpus_path: Path) -> str:
+    return corpus_path.name
