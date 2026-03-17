@@ -5,6 +5,7 @@ from typing import Callable
 
 from app.ingestion.parser import parse_md, parse_pdf, parse_txt
 from app.schemas.models import Document
+from app.core.config import DEFAULT_CORPUS_PATH
 
 
 class DocumentLoader:
@@ -19,7 +20,7 @@ class DocumentLoader:
         ".pdf": parse_pdf,
     }
 
-    def __init__(self, data_dir: str = "data/raw") -> None:
+    def __init__(self, data_dir: str | Path = DEFAULT_CORPUS_PATH) -> None:
         self.data_dir = Path(data_dir)
 
     def load_documents(self) -> list[Document]:

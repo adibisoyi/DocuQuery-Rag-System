@@ -11,10 +11,10 @@ from app.generation.providers.provider_factory import get_generation_provider
 from app.ingestion.loader import DocumentLoader
 from app.retrieval.retriever import Retriever
 from app.retrieval.vector_store import VectorStore
-
+from app.core.config import DEFAULT_CORPUS_PATH, DEFAULT_EVAL_DATASET
 
 def build_pipeline() -> tuple[Retriever, Generator]:
-    loader = DocumentLoader(data_dir="data/raw")
+    loader = DocumentLoader(data_dir=DEFAULT_CORPUS_PATH)
     documents = loader.load_documents()
 
     chunker = Chunker(chunk_size=600, chunk_overlap=100)
@@ -35,7 +35,7 @@ def build_pipeline() -> tuple[Retriever, Generator]:
     return retriever, generator
 
 
-def load_eval_dataset(path: str = "eval/eval_dataset.json") -> List[Dict[str, Any]]:
+def load_eval_dataset(path: str | Path = DEFAULT_EVAL_DATASET) -> List[Dict[str, Any]]:
     dataset_path = Path(path)
     return json.loads(dataset_path.read_text(encoding="utf-8"))
 

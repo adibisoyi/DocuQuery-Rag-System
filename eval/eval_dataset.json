@@ -11,8 +11,8 @@
     "question": "What improves answer quality by retrieving relevant document chunks before generation?",
     "expected_source": "sample.txt::sample.txt_chunk_1",
     "expected_answer_contains": [
-      "retrieval",
-      "answer quality"
+      "improves answer quality",
+      "retrieving relevant document chunks"
     ]
   },
   {
