@@ -4,3 +4,6 @@ pytest
 sentence-transformers
 numpy
 faiss-cpu
+openai
+requests
+python-dotenv

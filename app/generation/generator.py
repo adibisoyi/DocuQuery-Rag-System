@@ -36,10 +36,13 @@ class Generator:
         context = self.build_context(results)
 
         return (
-            "You are a document-grounded assistant.\n"
-            "Use only the provided context to answer the question.\n"
-            'If the answer is not in the context, say: "I don\'t know based on the provided documents."\n'
-            "Cite the source chunk IDs for important claims.\n\n"
+            "You must answer ONLY using the provided context.\n"
+            "Do NOT use prior knowledge.\n"
+            "Do NOT make assumptions.\n"
+            "Do NOT expand abbreviations or acronyms unless the expansion is explicitly present in the context.\n"
+            "Do NOT add definitions, examples, or extra uses unless they are explicitly supported by the context.\n"
+            'If the answer is not explicitly supported by the context, say: "I don\'t know based on the provided documents."\n'
+            "Return a concise answer and cite the supporting chunk IDs for important claims.\n\n"
             f"QUESTION:\n{question}\n\n"
             f"CONTEXT:\n{context}"
         )
@@ -57,17 +60,12 @@ class Generator:
         # Call provider
         provider_output = self.provider.generate(prompt)
 
-        # Still use top chunk as fallback grounding
-        top_result = results[0]
-        grounded_answer = top_result.chunk.text.strip()
-
-        sources = [
-            f"{result.chunk.source}::{result.chunk.chunk_id}"
-            for result in results[: self.max_context_chunks]
-        ]
+        # Return only the primary source used for answer generation
+        primary_result = results[0]
+        sources = [f"{primary_result.chunk.source}::{primary_result.chunk.chunk_id}"]
 
         return QueryResponse(
-            answer=f"{provider_output}\n\n{grounded_answer}",
+            answer=provider_output,
             sources=sources,
             metadata={"prompt": prompt},
         )
