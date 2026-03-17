@@ -1,5 +1,6 @@
 from app.chunking.chunker import Chunker
 from app.embeddings.embedder import Embedder
+from app.generation.generator import Generator
 from app.ingestion.loader import DocumentLoader
 from app.retrieval.retriever import Retriever
 from app.retrieval.vector_store import VectorStore
@@ -27,16 +28,19 @@ def main() -> None:
     print(f"Indexed {len(vector_store.records)} records in FAISS")
 
     retriever = Retriever(embedder=embedder, vector_store=vector_store, top_k=3)
+    generator = Generator(max_context_chunks=3)
 
     query = "What is FAISS used for?"
     results = retriever.retrieve(query)
+    response = generator.generate(query, results)
 
     print(f"\nQuery: {query}")
-    print(f"Retrieved {len(results)} results")
+    print("\nAnswer:")
+    print(response.answer)
 
-    for result in results:
-        preview = result.chunk.text[:120].replace("\n", " ")
-        print(f"- score={result.score:.4f} | {result.chunk.chunk_id} | {preview}...")
+    print("\nSources:")
+    for source in response.sources:
+        print(f"- {source}")
 
 
 if __name__ == "__main__":
