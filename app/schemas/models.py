@@ -40,3 +40,14 @@ class QueryResponse:
     answer: str
     sources: List[str]
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class EmbeddingRecord:
+    """
+    Represents an embedded chunk ready for indexing.
+    """
+    chunk_id: str
+    source: str
+    text: str
+    embedding: List[float]
+    metadata: Dict[str, Any] = field(default_factory=dict)
