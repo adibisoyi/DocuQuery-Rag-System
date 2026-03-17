@@ -1,6 +1,7 @@
 from app.chunking.chunker import Chunker
 from app.embeddings.embedder import Embedder
 from app.ingestion.loader import DocumentLoader
+from app.retrieval.vector_store import VectorStore
 
 
 def main() -> None:
@@ -16,10 +17,25 @@ def main() -> None:
     records = embedder.embed_chunks(chunks)
     print(f"Generated {len(records)} embedding records")
 
-    for record in records[:3]:
-        print(
-            f"- {record.chunk_id} | dim={len(record.embedding)} | source={record.source}"
-        )
+    if not records:
+        print("No embeddings generated. Exiting.")
+        return
+
+    embedding_dim = len(records[0].embedding)
+    vector_store = VectorStore(embedding_dim=embedding_dim)
+    vector_store.add_embeddings(records)
+    print(f"Indexed {len(vector_store.records)} records in FAISS")
+
+    query = "What is FAISS used for?"
+    query_embedding = embedder.embed_texts([query])[0].tolist()
+    results = vector_store.search(query_embedding, top_k=3)
+
+    print(f"\nQuery: {query}")
+    print(f"Retrieved {len(results)} results")
+
+    for result in results:
+        preview = result.chunk.text[:120].replace("\n", " ")
+        print(f"- score={result.score:.4f} | {result.chunk.chunk_id} | {preview}...")
 
 
 if __name__ == "__main__":
