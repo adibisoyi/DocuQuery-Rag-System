@@ -1,5 +1,5 @@
 # DocuQuery - Production-Ready RAG System
-[![License](https://img.shields.io/github/license/adibisoyi/DocuQuery-Rag-System)](https://img.shields.io/github/license/adibisoyi/DocuQuery-Rag-System?cacheSeconds=60)
+![LICENSE](https://img.shields.io/github/license/adibisoyi/DocuQuery-Rag-System?cacheSeconds=60)
 ![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
